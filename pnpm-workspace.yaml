@@ -1,2 +1,6 @@
 packages:
-  - "packages/*"
+  - packages/*
+
+overrides:
+  BIG: link:BIG
+  react: link:../../AppData/Local/pnpm/global/5/node_modules/REACT/dist/node_modules/react
