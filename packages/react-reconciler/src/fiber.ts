@@ -1,13 +1,14 @@
 import { Props, Key, Ref } from 'shared/ReactTypes';
 import { WorkTag } from './workTags';
-import { Flags } from './fiberFlags';
+import { Flags, NoFlags } from './fiberFlags';
+import { Container } from 'hostConfig';
 
 export class FiberNode {
 	type: any;
 	tag: WorkTag;
 	pendingProps: Props;
 	key: Key;
-	stateNode: FiberNode | null;
+	stateNode: any;
 	ref: Ref;
 
 	return: FiberNode | null;
@@ -16,8 +17,10 @@ export class FiberNode {
 	index: number;
 
 	memoriedProps: Props | null;
+	memoizedState: any;
 	alternate: FiberNode | null;
 	flags: Flags;
+	updateQueue: unknown;
 
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
 		this.tag = tag;
@@ -36,6 +39,7 @@ export class FiberNode {
 		//作为工作单元
 		this.pendingProps = pendingProps;
 		this.memoriedProps = null;
+		this.updateQueue = null;
 
 		this.alternate = null;
 
@@ -43,3 +47,39 @@ export class FiberNode {
 		this.flags = NoFlags;
 	}
 }
+
+export class FiberRootNode {
+	container: Container;
+	current: FiberNode;
+	finisherWork: FiberNode | null;
+	constructor(container: Container, hostRootFiber: FiberNode) {
+		this.container = container;
+		this.current = hostRootFiber;
+		hostRootFiber.stateNode = this;
+		this.finisherWork = null;
+	}
+}
+
+export const createWorkInProgress = (
+	current: FiberNode,
+	pendingProps: Props
+): FiberNode => {
+	let wip = current.alternate;
+	if (wip === null) {
+		wip = new FiberNode(current.tag, pendingProps, current.key);
+		wip.stateNode = current.stateNode;
+
+		wip.alternate = current;
+		current.alternate = wip;
+	} else {
+		wip.pendingProps = pendingProps;
+		wip.flags = NoFlags;
+	}
+	wip.type = current.type;
+	wip.updateQueue = current.updateQueue;
+	wip.child = current.child;
+	wip.memoriedProps = current.memoriedProps;
+	wip.memoizedState = current.memoizedState;
+
+	return wip;
+};
