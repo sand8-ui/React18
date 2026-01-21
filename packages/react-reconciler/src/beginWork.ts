@@ -18,6 +18,7 @@ export const beginWork = (wip: FiberNode) => {
 				console.log('beginWork hasnt completed type');
 			}
 	}
+	return null;
 };
 
 function updateHostRoot(wip: FiberNode) {

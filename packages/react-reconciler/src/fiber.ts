@@ -1,4 +1,4 @@
-import { Props, Key, Ref } from 'shared/ReactTypes';
+import { Props, Key, Ref, ReactElementType } from 'shared/ReactTypes';
 import { FunctionComponent, WorkTag, HostComponent } from './workTags';
 import { Flags, NoFlags } from './fiberFlags';
 import { Container } from 'hostConfig';
@@ -21,6 +21,7 @@ export class FiberNode {
 	alternate: FiberNode | null;
 	flags: Flags;
 	updateQueue: unknown;
+	subtreeFlags: Flags;
 
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
 		this.tag = tag;
@@ -45,6 +46,7 @@ export class FiberNode {
 
 		//副作用
 		this.flags = NoFlags;
+		this.subtreeFlags = NoFlags;
 	}
 }
 

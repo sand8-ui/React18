@@ -1,7 +1,9 @@
 import { beginWork } from './beginWork';
+import { commitMutationEffects } from './commitWork';
 import { completeWork } from './completeWork';
 import { createWorkInProgress, FiberNode, FiberRootNode } from './fiber';
 import { HostRoot } from './workTags';
+import { MutationMask, NoFlags } from './fiberFlags';
 
 let workInProgress: FiberNode | null = null;
 
@@ -27,7 +29,7 @@ function markUpdateFromFiberToRoot(fiber: FiberNode) {
 	return null;
 }
 
-function renderRoot(root: FiberNode) {
+function renderRoot(root: FiberRootNode) {
 	//initializatioin
 	prepareFreshStack(root);
 
@@ -43,8 +45,43 @@ function renderRoot(root: FiberNode) {
 			workInProgress = null;
 		}
 	} while (true);
+
+	const finishedWork = root.current.alternate;
+	root.finisherWork = finishedWork;
+
+	commitRoot(root);
 }
 
+function commitRoot(root: FiberRootNode) {
+	const finishedWork = root.finisherWork;
+
+	//reset
+	root.finisherWork = null;
+
+	if (finishedWork === null) {
+		return;
+	}
+
+	if (__DEV__) {
+		console.warn('commit阶段开始', finishedWork);
+	}
+
+	const subtreeHasEffect =
+		(finishedWork.subtreeFlags & MutationMask) !== NoFlags;
+	const rootHasEffect = (finishedWork.flags & MutationMask) !== NoFlags;
+
+	if (subtreeHasEffect || rootHasEffect) {
+		//berforeMutation
+		//mutation Placement
+		commitMutationEffects(finishedWork);
+
+		root.current = finishedWork;
+
+		//layout
+	} else {
+		root.current = finishedWork;
+	}
+}
 function workLoop() {
 	while (workInProgress !== null) {
 		performUnitOfWork(workInProgress);
