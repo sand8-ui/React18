@@ -24,6 +24,7 @@
 		"@rollup/plugin-commonjs": "^29.0.0",
 		"@types/node": "^24.10.1",
 		"@typescript-eslint/eslint-plugin": "^8.53.0",
+		"@vitejs/plugin-react": "^5.1.2",
 		"commitlint": "^20.3.1",
 		"eslint": "^9.39.2",
 		"eslint-config-prettier": "^10.1.8",
