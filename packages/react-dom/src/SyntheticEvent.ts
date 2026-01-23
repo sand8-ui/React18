@@ -85,7 +85,7 @@ function dispatchEvent(container: Container, eventType: string, e: Event) {
 	}
 }
 
-function triggerEventFlow(paths: EventCallback[], se: SyntheticEvent) {
+function triggerEventFlow(paths: EventCallBack[], se: SyntheticEvent) {
 	for (let i = 0; i < paths.length; i++) {
 		const callback = paths[i];
 		callback.call(null, se);
