@@ -29,6 +29,12 @@ export const beginWork = (wip: FiberNode) => {
 	return null;
 };
 
+function updateFragment(wip: FiberNode) {
+	const nextChildren = wip.pendingProps;
+	reconcileChildren(wip, nextChildren);
+	return wip.child;
+}
+
 function updateFunctionComponent(wip: FiberNode) {
 	const nextchildren = renderWithHooks(wip);
 	reconcileChildren(wip, nextchildren);
