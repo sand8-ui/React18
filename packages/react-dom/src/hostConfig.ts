@@ -1,6 +1,7 @@
 import { FiberNode } from 'react-reconciler/src/fiber';
 import { HostText } from 'react-reconciler/src/workTags';
 import { DOMElement, updateFiberProps } from './SyntheticEvent';
+import { Props } from 'shared/ReactTypes';
 export type Container = Element;
 export type Instance = Element;
 export type TextInstance = Text;
@@ -57,3 +58,11 @@ export function removeChild(
 ) {
 	container.removeChild(child);
 }
+
+export const scheduleMicroTask =
+	typeof queueMicrotask === 'function'
+		? queueMicrotask
+		: typeof Promise === 'function'
+			? (callback: (...args: any) => void) =>
+					Promise.resolve(null).then(callback)
+			: setTimeout;
