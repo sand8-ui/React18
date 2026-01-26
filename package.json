@@ -22,7 +22,9 @@
 		"@commitlint/config-conventional": "^20.3.1",
 		"@eslint/js": "^9.39.2",
 		"@rollup/plugin-commonjs": "^29.0.0",
+		"@tsconfig/strictest": "^2.0.8",
 		"@types/node": "^24.10.1",
+		"@types/scheduler": "^0.26.0",
 		"@typescript-eslint/eslint-plugin": "^8.53.0",
 		"@vitejs/plugin-react": "^5.1.2",
 		"commitlint": "^20.3.1",
@@ -49,6 +51,7 @@
 	"dependencies": {
 		"-": "^0.0.1",
 		"D": "^1.0.0",
-		"plugin": "^0.3.3"
+		"plugin": "^0.3.3",
+		"scheduler": "^0.27.0"
 	}
 }
