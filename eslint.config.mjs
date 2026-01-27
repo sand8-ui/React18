@@ -1,15 +1,29 @@
-import js from '@eslint/js';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
-import { defineConfig } from 'eslint/config';
-import jest from 'eslint-plugin-jest/lib/index.js';
-
-export default defineConfig([
-	{
-		files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
-		plugins: { js, jest },
-		extends: ['js/recommended', 'plugin:jest/recommended'],
-		languageOptions: { globals: globals.node, ...globals.jest }
+export default {
+	env: {
+		browser: true,
+		es2021: true,
+		node: true,
+		jest: true
 	},
-	tseslint.configs.recommended
-]);
+	extends: [
+		'eslint:recommended',
+		'plugin:@typescript - eslint/recommended',
+		'prettier',
+		'plugin:prettier/recommended'
+	],
+	parser: '@typescript - eslint/parser',
+	parserOptions: {
+		ecmaVersion: 'latest',
+		sourceType: 'module'
+	},
+	plugins: ['@typescript - eslint', 'prettier'],
+	rules: {
+		'prettier/prettier': 'error',
+		'no - case - declarations': 'off',
+		'no - constant - condition': 'off',
+		'@typescript - eslint/ban - ts - comment': 'off',
+		'@typescript - eslint/no - unused - vars': 'off',
+		'@typescript - eslint/no - var - requires': 'off',
+		'no - unused - vars': 'off'
+	}
+};
