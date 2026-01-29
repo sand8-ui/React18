@@ -71,6 +71,10 @@ export class FiberRootNode {
 	pendingLanes: Lanes;
 	finishedLane: Lane;
 	pendingPassiveEffects: PendingPassiveEffects;
+
+	callbackNode: CallbackNode | null;
+	callbackPriority: Lane;
+
 	constructor(container: Container, hostRootFiber: FiberNode) {
 		this.container = container;
 		this.current = hostRootFiber;
@@ -78,6 +82,9 @@ export class FiberRootNode {
 		this.finisherWork = null;
 		this.pendingLanes = NoLanes;
 		this.finishedLane = NoLane;
+		this.callbackNode = null;
+		this.callbackPriority = NoLane;
+
 		this.pendingPassiveEffects = {
 			unmount: [],
 			update: []
