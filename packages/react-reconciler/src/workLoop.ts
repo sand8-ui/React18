@@ -45,7 +45,7 @@ const RootCompleted = 2;
 
 function prepareFreshStack(root: FiberRootNode, lane: Lane) {
 	root.finishedLane = NoLane;
-	root.finisherWork = null;
+	root.finishedWork = null;
 	workInProgress = createWorkInProgress(root.current, {});
 	wipRootRenderLane = lane;
 }
@@ -155,7 +155,7 @@ function performConcurrentWorkOnRoot(
 	}
 	if (exitStatus === RootCompleted) {
 		const finishedWork = root.current.alternate;
-		root.finisherWork = finishedWork;
+		root.finishedWork = finishedWork;
 		root.finishedLane = lane;
 		wipRootRenderLane = NoLane;
 		commitRoot(root);
@@ -178,7 +178,7 @@ function performSyncWorkOnRoot(root: FiberRootNode) {
 
 	if (exitStatus === RootCompleted) {
 		const finishedWork = root.current.alternate;
-		root.finisherWork = finishedWork;
+		root.finishedWork = finishedWork;
 		root.finishedLane = nextLane;
 		wipRootRenderLane = NoLane;
 
@@ -224,7 +224,7 @@ function renderRoot(root: FiberRootNode, lane: Lane, shouldTimeSlice: boolean) {
 }
 
 function commitRoot(root: FiberRootNode) {
-	const finishedWork = root.finisherWork;
+	const finishedWork = root.finishedWork;
 
 	if (finishedWork === null) {
 		return;
@@ -240,7 +240,7 @@ function commitRoot(root: FiberRootNode) {
 	}
 
 	// 重置
-	root.finisherWork = null;
+	root.finishedWork = null;
 	root.finishedLane = NoLane;
 
 	markRootFinished(root, lane);
@@ -316,7 +316,7 @@ function workLoopConcurrent() {
 
 function performUnitOfWork(fiber: FiberNode) {
 	const next = beginWork(fiber, wipRootRenderLane);
-	fiber.memoriedProps = fiber.pendingProps;
+	fiber.memoizedProps = fiber.pendingProps;
 
 	if (next === null) {
 		completeUnitOfWork(fiber);
