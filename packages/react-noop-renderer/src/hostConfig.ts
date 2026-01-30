@@ -1,18 +1,13 @@
-import { FiberNode } from 'react-reconciler/src/fiber';
-import { HostText } from 'react-reconciler/src/workTags';
-import { Props } from 'shared/ReactTypes';
-
 export interface Container {
 	rootID: number;
 	children: (Instance | TextInstance)[];
 }
-
 export interface Instance {
 	id: number;
 	type: string;
 	children: (Instance | TextInstance)[];
 	parent: number;
-	props: Props;
+	props: any;
 }
 export interface TextInstance {
 	text: string;
@@ -20,10 +15,12 @@ export interface TextInstance {
 	parent: number;
 }
 
+import { FiberNode } from 'react-reconciler/src/fiber';
+import { HostText } from 'react-reconciler/src/workTags';
+
 let instanceCounter = 0;
 
-// export const createInstance = (type: string, props: any): Instance => {
-export const createInstance = (type: string, props: Props): Instance => {
+export const createInstance = (type: string, props: any): Instance => {
 	const instance = {
 		id: instanceCounter++,
 		type,
@@ -34,22 +31,7 @@ export const createInstance = (type: string, props: Props): Instance => {
 	return instance;
 };
 
-export const appendInitialChild = (
-	parent: Instance | Container,
-	child: Instance
-) => {
-	// id
-	const prevParentID = child.parent;
-	const parentID = 'rootID' in parent ? parent.rootID : parent.id;
-
-	if (prevParentID !== -1 && prevParentID !== parentID) {
-		throw new Error('不能重复挂载child');
-	}
-	child.parent = parentID;
-	parent.children.push(child);
-};
-
-export const createTextInstance = (content: string) => {
+export const createTextInstance = (content: string): TextInstance => {
 	const instance = {
 		text: content,
 		id: instanceCounter++,
@@ -58,66 +40,74 @@ export const createTextInstance = (content: string) => {
 	return instance;
 };
 
-export const appendChildToContainer = (parent: Container, child: Instance) => {
-	// id
-	const prevParentID = child.parent;
-
-	if (prevParentID !== -1 && prevParentID !== parent.rootID) {
+export const appendInitialChild = (parent: Instance, child: Instance) => {
+	const prevParent = child.parent;
+	if (prevParent !== -1 && prevParent !== parent.id) {
 		throw new Error('不能重复挂载child');
 	}
-	child.parent = parent.rootID;
+	child.parent = parent.id;
 	parent.children.push(child);
 };
 
-export function commitUpdate(fiber: FiberNode) {
-	switch (fiber.tag) {
-		case HostText:
-			const text = fiber.memoizedProps?.content;
-			return commitTextUpdate(fiber.stateNode, text);
-		default:
-			if (__DEV__) {
-				console.warn('未实现的Update类型', fiber);
-			}
-			break;
-	}
-}
-
-export function commitTextUpdate(textInstance: TextInstance, content: string) {
-	textInstance.text = content;
-}
-
-export function removeChild(
+export const appendChildToContainer = (
 	child: Instance | TextInstance,
 	container: Container
-) {
-	const index = container.children.indexOf(child);
-
-	if (index === -1) {
-		throw new Error('child不存在');
+) => {
+	const prevParent = child.parent;
+	if (prevParent !== -1 && prevParent !== container.rootID) {
+		throw new Error('不能重复挂载child');
 	}
-	container.children.splice(index, 1);
-}
-
-export function insertChildToContainer(
-	child: Instance,
-	container: Container,
-	before: Instance
-) {
-	const beforeIndex = container.children.indexOf(before);
-	if (beforeIndex === -1) {
-		throw new Error('before不存在');
-	}
+	child.parent = container.rootID;
 	const index = container.children.indexOf(child);
 	if (index !== -1) {
 		container.children.splice(index, 1);
 	}
+	container.children.push(child);
+};
+
+export const insertChildToContainer = (
+	child: Instance,
+	container: Container,
+	before: Instance
+) => {
+	const index = container.children.indexOf(child);
+	if (index !== -1) {
+		container.children.splice(index, 1);
+	}
+	const beforeIndex = container.children.indexOf(before);
+	if (beforeIndex === -1) {
+		throw new Error('before不存在');
+	}
 	container.children.splice(beforeIndex, 0, child);
+};
+
+export const removeChild = (child: Instance, container: Container) => {
+	const index = container.children.indexOf(child);
+	if (index === -1) {
+		throw new Error('child不存在');
+	}
+	container.children.splice(index, 1);
+};
+
+export function commitUpdate(finishedWork: FiberNode) {
+	switch (finishedWork.tag) {
+		case HostText:
+			const newContent = finishedWork.pendingProps.content;
+			return commitTextUpdate(finishedWork.stateNode, newContent);
+	}
+	console.error('commitUpdate未支持的类型', finishedWork);
 }
 
-export const scheduleMicroTask =
+export const commitTextUpdate = (
+	textIntance: TextInstance,
+	content: string
+) => {
+	textIntance.text = content;
+};
+
+export const scheduleMicrotask =
 	typeof queueMicrotask === 'function'
 		? queueMicrotask
 		: typeof Promise === 'function'
-			? (callback: (...args: any) => void) =>
-					Promise.resolve(null).then(callback)
+			? (callback: () => void) => Promise.resolve(null).then(callback)
 			: setTimeout;

@@ -1,47 +1,48 @@
-import { Props, Key, Ref, ReactElementType } from 'shared/ReactTypes';
+import { Key, Props, ReactElement, Ref } from 'shared/ReactTypes';
+import { Flags, NoFlags } from './fiberFlags';
+import { Effect } from './fiberHooks';
+import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
+import { Container } from 'hostConfig';
 import {
 	Fragment,
 	FunctionComponent,
 	HostComponent,
 	WorkTag
 } from './workTags';
-import { Flags, NoFlags } from './fiberFlags';
-import { Container } from 'hostConfig';
-import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
-import { Effect } from './fiberHooks';
 import { CallbackNode } from 'scheduler';
 
 export class FiberNode {
-	type: any;
-	tag: WorkTag;
 	pendingProps: Props;
+	memoizedProps: Props | null;
 	key: Key;
 	stateNode: any;
+	type: any;
 	ref: Ref;
+	tag: WorkTag;
+	flags: Flags;
+	subtreeFlags: Flags;
+	deletions: FiberNode[] | null;
 
 	return: FiberNode | null;
 	sibling: FiberNode | null;
 	child: FiberNode | null;
 	index: number;
 
-	memoizedProps: Props | null;
-	memoizedState: any;
-	alternate: FiberNode | null;
-	flags: Flags;
-	subtreeFlags: Flags;
 	updateQueue: unknown;
-	deletions: FiberNode[] | null;
+	memoizedState: any;
+
+	alternate: FiberNode | null;
+
+	lanes: Lanes;
 
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
 		// 实例
 		this.tag = tag;
 		this.key = key || null;
-		// HostComponent <div> div DOM
 		this.stateNode = null;
-		// FunctionComponent () => {}
 		this.type = null;
 
-		// 构成树状结构
+		// 树结构
 		this.return = null;
 		this.sibling = null;
 		this.child = null;
@@ -49,17 +50,22 @@ export class FiberNode {
 
 		this.ref = null;
 
-		// 作为工作单元
+		// 状态
 		this.pendingProps = pendingProps;
 		this.memoizedProps = null;
-		this.memoizedState = null;
 		this.updateQueue = null;
+		this.memoizedState = null;
 
-		this.alternate = null;
 		// 副作用
 		this.flags = NoFlags;
 		this.subtreeFlags = NoFlags;
 		this.deletions = null;
+
+		// 调度
+		this.lanes = NoLane;
+		// this.childLanes = NoLanes;
+
+		this.alternate = null;
 	}
 }
 
@@ -73,28 +79,63 @@ export class FiberRootNode {
 	current: FiberNode;
 	finishedWork: FiberNode | null;
 	pendingLanes: Lanes;
-	finishedLane: Lane;
-	pendingPassiveEffects: PendingPassiveEffects;
-
+	finishedLanes: Lanes;
 	callbackNode: CallbackNode | null;
 	callbackPriority: Lane;
-
+	pendingPassiveEffects: PendingPassiveEffects;
 	constructor(container: Container, hostRootFiber: FiberNode) {
 		this.container = container;
 		this.current = hostRootFiber;
 		hostRootFiber.stateNode = this;
 		this.finishedWork = null;
-		this.pendingLanes = NoLanes;
-		this.finishedLane = NoLane;
-
-		this.callbackNode = null;
-		this.callbackPriority = NoLane;
-
+		// 保存未执行的effect
 		this.pendingPassiveEffects = {
+			// 属于卸载组件的
 			unmount: [],
+			// 属于更新组件的
 			update: []
 		};
+
+		// 所有未执行的lane的集合
+		this.pendingLanes = NoLanes;
+		// 本轮更新执行的lanes
+		this.finishedLanes = NoLane;
+
+		// 调度的回调函数
+		this.callbackNode = null;
+		// 调度的回调函数优先级
+		this.callbackPriority = NoLane;
 	}
+}
+
+export function createFiberFromElement(
+	element: ReactElement,
+	lanes: Lanes
+): FiberNode {
+	const { type, key, props, ref } = element;
+	let fiberTag: WorkTag = FunctionComponent;
+
+	if (typeof type === 'string') {
+		fiberTag = HostComponent;
+	} else if (typeof type !== 'function') {
+		console.error('未定义的type类型', element);
+	}
+	const fiber = new FiberNode(fiberTag, props, key);
+	fiber.type = type;
+	fiber.lanes = lanes;
+	fiber.ref = ref;
+
+	return fiber;
+}
+
+export function createFiberFromFragment(
+	elements: ReactElement[],
+	lanes: Lanes,
+	key: Key
+): FiberNode {
+	const fiber = new FiberNode(Fragment, elements, key);
+	fiber.lanes = lanes;
+	return fiber;
 }
 
 export const createWorkInProgress = (
@@ -106,6 +147,7 @@ export const createWorkInProgress = (
 	if (wip === null) {
 		// mount
 		wip = new FiberNode(current.tag, pendingProps, current.key);
+		wip.type = current.type;
 		wip.stateNode = current.stateNode;
 
 		wip.alternate = current;
@@ -116,32 +158,18 @@ export const createWorkInProgress = (
 		wip.flags = NoFlags;
 		wip.subtreeFlags = NoFlags;
 		wip.deletions = null;
+		wip.type = current.type;
 	}
-	wip.type = current.type;
 	wip.updateQueue = current.updateQueue;
+	wip.flags = current.flags;
 	wip.child = current.child;
+
+	// 数据
 	wip.memoizedProps = current.memoizedProps;
 	wip.memoizedState = current.memoizedState;
+	wip.ref = current.ref;
+
+	wip.lanes = current.lanes;
 
 	return wip;
 };
-
-export function createFiberFromElement(element: ReactElementType): FiberNode {
-	const { type, key, props } = element;
-	let fiberTag: WorkTag = FunctionComponent;
-
-	if (typeof type === 'string') {
-		// <div/> type: 'div'
-		fiberTag = HostComponent;
-	} else if (typeof type !== 'function' && __DEV__) {
-		console.warn('为定义的type类型', element);
-	}
-	const fiber = new FiberNode(fiberTag, props, key);
-	fiber.type = type;
-	return fiber;
-}
-
-export function createFiberFromFragment(elements: any[], key: Key): FiberNode {
-	const fiber = new FiberNode(Fragment, elements, key);
-	return fiber;
-}
