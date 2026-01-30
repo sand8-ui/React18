@@ -8,7 +8,7 @@
 		"prepare": "husky",
 		"lint": "eslint .",
 		"build:dev": "rimraf dist && rollup --bundleConfigAsCjs --config scripts/rollup/dev.config.js",
-		"demo": "vite serve demos/test-fc --config --config scripts/vite/vite.config.js --force"
+		"demo": "vite serve demos/Ref --config --config scripts/vite/vite.config.js --force"
 	},
 	"keywords": [],
 	"author": "",

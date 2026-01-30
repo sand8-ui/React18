@@ -3,7 +3,7 @@ import {
 	updateContainer,
 	createContainer
 } from 'react-reconciler/src/fiberReconciler';
-import { ReactElement } from 'shared/ReactTypes';
+import { ReactElementType } from 'shared/ReactTypes';
 import { initEvent, elementPropsKey } from './SyntheticEvent';
 
 const containerToRoot = new Map();
@@ -31,7 +31,7 @@ export function createRoot(container: Container) {
 		throw '你在之前已经传递给createRoot()的container上调用了ReactDOM.createRoot()';
 	}
 	return {
-		render(element: ReactElement) {
+		render(element: ReactElementType) {
 			if (containerToRoot.get(container) !== root) {
 				throw '不能更新一个卸载的root.';
 			}

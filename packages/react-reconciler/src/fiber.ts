@@ -1,4 +1,4 @@
-import { Key, Props, ReactElement, Ref } from 'shared/ReactTypes';
+import { Key, Props, ReactElementType, Ref } from 'shared/ReactTypes';
 import { Flags, NoFlags } from './fiberFlags';
 import { Effect } from './fiberHooks';
 import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
@@ -109,7 +109,7 @@ export class FiberRootNode {
 }
 
 export function createFiberFromElement(
-	element: ReactElement,
+	element: ReactElementType,
 	lanes: Lanes
 ): FiberNode {
 	const { type, key, props, ref } = element;
@@ -129,7 +129,7 @@ export function createFiberFromElement(
 }
 
 export function createFiberFromFragment(
-	elements: ReactElement[],
+	elements: ReactElementType[],
 	lanes: Lanes,
 	key: Key
 ): FiberNode {

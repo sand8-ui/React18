@@ -6,7 +6,7 @@ export type Props = {
 	children?: any;
 };
 
-export interface ReactElement {
+export interface ReactElementType {
 	$$typeof: symbol | number;
 	type: ElementType;
 	key: Key;

@@ -1,5 +1,5 @@
 import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE } from 'shared/ReactSymbols';
-import { Props, ReactElement } from 'shared/ReactTypes';
+import { Props, ReactElementType } from 'shared/ReactTypes';
 import {
 	createFiberFromElement,
 	createFiberFromFragment,
@@ -46,7 +46,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 	function reconcileSingleElement(
 		returnFiber: FiberNode,
 		currentFirstChild: FiberNode | null,
-		element: ReactElement,
+		element: ReactElementType,
 		lanes: Lanes
 	) {
 		// 前：abc 后：a  删除bc

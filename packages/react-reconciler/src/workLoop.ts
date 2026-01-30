@@ -59,9 +59,9 @@ const RootCompleted = 2;
 let rootDoesHavePassiveEffects = false;
 
 export function scheduleUpdateOnFiber(fiber: FiberNode, lane: Lane) {
-	if (__LOG__) {
-		console.log('开始schedule阶段', fiber, lane);
-	}
+	//if (__LOG__) {
+	//	console.log('开始schedule阶段', fiber, lane);
+	//}
 	const root = markUpdateLaneFromFiberToRoot(fiber, lane);
 	// TODO 饥饿问题
 	markRootUpdated(root, lane);
@@ -123,9 +123,9 @@ function ensureRootIsScheduled(root: FiberRootNode) {
 	let newCallbackNode = null;
 	if (curPriority === SyncLane) {
 		// React调度
-		if (__LOG__) {
-			console.log('在微任务中调度执行，优先级：', updateLanes);
-		}
+		//if (__LOG__) {
+		//	console.log('在微任务中调度执行，优先级：', updateLanes);
+		//}
 		// 微任务中调度执行
 		scheduleSyncCallback(performSyncWorkOnRoot.bind(null, root, updateLanes));
 		scheduleMicrotask(flushSyncCallbacks);
@@ -197,9 +197,9 @@ function renderRoot(
 	lanes: Lanes,
 	shouldTimeSlice: boolean
 ) {
-	if (__LOG__) {
-		console.log(`开始${shouldTimeSlice ? '并发' : '同步'}render阶段`, root);
-	}
+	//if (__LOG__) {
+	//	console.log(`开始${shouldTimeSlice ? '并发' : '同步'}render阶段`, root);
+	//}
 	const prevExecutionContext = executionContext;
 	executionContext |= RenderContext;
 
@@ -284,9 +284,9 @@ function commitRoot(root: FiberRootNode) {
 	if (finishedWork === null) {
 		return;
 	}
-	if (__LOG__) {
-		console.log('开始commit阶段', finishedWork);
-	}
+	//if (__LOG__) {
+	//	console.log('开始commit阶段', finishedWork);
+	//}
 	const lanes = root.finishedLanes;
 
 	// 重置
@@ -352,9 +352,9 @@ function commitRoot(root: FiberRootNode) {
 }
 
 function prepareFreshStack(root: FiberRootNode, lanes: Lanes) {
-	if (__LOG__) {
-		console.log('render阶段初始化工作', root);
-	}
+	//if (__LOG__) {
+	//	console.log('render阶段初始化工作', root);
+	//}
 	workInProgress = createWorkInProgress(root.current, {});
 	workInProgressRootRenderLane = lanes;
 }

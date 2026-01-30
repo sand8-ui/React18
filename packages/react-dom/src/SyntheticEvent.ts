@@ -81,14 +81,14 @@ const dispatchEvent = (container: Container, eventType: string, e: Event) => {
 		eventType
 	);
 	const se = createSyntheticEvent(e);
-	if (__LOG__) {
-		console.log('模拟事件捕获阶段：', eventType);
-	}
+	//if (__LOG__) {
+	//	console.log('模拟事件捕获阶段：', eventType);
+	//}
 	triggerEventFlow(capture, se);
 	if (!se.__stopPropagation) {
-		if (__LOG__) {
-			console.log('模拟事件冒泡阶段：', eventType);
-		}
+		//	if (__LOG__) {
+		//		console.log('模拟事件冒泡阶段：', eventType);
+		//	}
 		triggerEventFlow(bubble, se);
 	}
 };
@@ -133,9 +133,9 @@ export const initEvent = (container: Container, eventType: string) => {
 		console.error('当前不支持', eventType, '事件');
 		return;
 	}
-	if (__LOG__) {
-		console.log('初始化事件：', eventType);
-	}
+	//if (__LOG__) {
+	//	console.log('初始化事件：', eventType);
+	//}
 	container.addEventListener(eventType, (e) => {
 		dispatchEvent(container, eventType, e);
 	});

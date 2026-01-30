@@ -40,9 +40,9 @@ export const removeChild = (child: Instance, container: Container) => {
 };
 
 export function commitUpdate(finishedWork: FiberNode) {
-	if (__LOG__) {
-		console.log('更新DOM、文本节点内容', finishedWork);
-	}
+	//if (__LOG__) {
+	//	console.log('更新DOM、文本节点内容', finishedWork);
+	//}
 	switch (finishedWork.tag) {
 		case HostText:
 			const newContent = finishedWork.pendingProps.content;

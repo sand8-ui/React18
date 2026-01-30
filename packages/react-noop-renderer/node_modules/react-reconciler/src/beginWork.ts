@@ -1,5 +1,5 @@
 import { Fragment } from 'react-reconciler/src/workTags';
-import { ReactElement } from 'shared/ReactTypes';
+import { ReactElementType } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFibers';
 import { FiberNode } from './fiber';
 import { renderWithHooks } from './fiberHooks';
@@ -14,9 +14,9 @@ import {
 import { Ref } from './fiberFlags';
 
 export const beginWork = (workInProgress: FiberNode, renderLanes: Lanes) => {
-	if (__LOG__) {
-		console.log('beginWork流程', workInProgress.type);
-	}
+	//	if (__LOG__) {
+	//		console.log('beginWork流程', workInProgress.type);
+	//	}
 	// 接下来processUpdate会消耗lanes
 	workInProgress.lanes = NoLane;
 
@@ -63,7 +63,8 @@ function updateHostComponent(workInProgress: FiberNode, renderLanes: Lanes) {
 
 function updateHostRoot(workInProgress: FiberNode, renderLanes: Lanes) {
 	const baseState = workInProgress.memoizedState;
-	const updateQueue = workInProgress.updateQueue as UpdateQueue<ReactElement>;
+	const updateQueue =
+		workInProgress.updateQueue as UpdateQueue<ReactElementType>;
 	const pending = updateQueue.shared.pending;
 	updateQueue.shared.pending = null;
 	const { memoizedState } = processUpdateQueue(baseState, pending, renderLanes);

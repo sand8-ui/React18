@@ -194,9 +194,9 @@ function gethostSibling(fiber: FiberNode) {
 }
 
 const commitPlacement = (finishedWork: FiberNode) => {
-	if (__LOG__) {
-		console.log('插入、移动DOM', finishedWork);
-	}
+	//if (__LOG__) {
+	//	console.log('插入、移动DOM', finishedWork);
+	//}
 	const hostParent = getHostParent(finishedWork) as Container;
 
 	const sibling = gethostSibling(finishedWork);
@@ -291,9 +291,9 @@ function recordHostChildrenToDelete(
  * FunctionComponent：effect相关hook的执行，并遍历子树
  */
 function commitDeletion(childToDelete: FiberNode, root: FiberRootNode) {
-	if (__LOG__) {
-		console.log('删除DOM、组件unmount', childToDelete);
-	}
+	//if (__LOG__) {
+	//		console.log('删除DOM、组件unmount', childToDelete);
+	//	}
 	// 在Fragment之前，只需删除子树的根Host节点，但支持Fragment后，可能需要删除同级多个节点
 	const hostChildrenToDelete: FiberNode[] = [];
 
